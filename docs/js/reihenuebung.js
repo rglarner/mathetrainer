@@ -1,5 +1,7 @@
 // JavaScript für die Reihenübung
 
+// Vollständige Logik mit festem Timer oben rechts
+
 document.addEventListener("DOMContentLoaded", function() {
     const multiplicationCheckbox = document.getElementById("multiplication");
     const divisionCheckbox = document.getElementById("division");
@@ -12,19 +14,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const messageBox = document.getElementById("errorMessage");
     const timerDisplay = document.getElementById("timer");
     const resultDisplay = document.getElementById("correctAnswers");
+
     const exerciseArea = document.getElementById("exerciseArea");
     const questionsContainer = document.getElementById("questions");
     const submitAnswersBtn = document.getElementById("submitAnswers");
     const resultArea = document.getElementById("resultArea");
     const restartButton = document.getElementById("restartButton");
 
+    const fixedTimer = document.getElementById("fixedTimer");
+    const fixedTimerText = document.getElementById("fixedTimerText");
+
     let timer;
     let totalQuestions = 0;
     let correctAnswers = 0;
     let timeLeft = 0; // in Sekunden
 
-    // sicherer Default für maxFactor falls HTML nicht gesetzt
-    if (!maxFactorSelect.value) maxFactorSelect.value = "10";
+    // Default maxFactor fallback
+    if (maxFactorSelect && !maxFactorSelect.value) maxFactorSelect.value = "10";
 
     function getSelectedRows() {
         return Array.from(rangeContainer.querySelectorAll('input[name="rangeOption"]:checked'))
@@ -75,31 +81,22 @@ document.addEventListener("DOMContentLoaded", function() {
         const includeDiv = divisionCheckbox.checked;
 
         for (let i = 0; i < totalQuestions; i++) {
-            // wähle zufällig Multiplikation oder Division, falls beide ausgewählt
             let mode;
-            if (includeMul && includeDiv) {
-                mode = Math.random() < 0.5 ? "mul" : "div";
-            } else if (includeMul) {
-                mode = "mul";
-            } else {
-                mode = "div";
-            }
+            if (includeMul && includeDiv) mode = Math.random() < 0.5 ? "mul" : "div";
+            else if (includeMul) mode = "mul";
+            else mode = "div";
 
-            // operand1 = ein Element aus ausgewählten Reihen (z.B. 3)
             const row = selectedRows[randInt(0, selectedRows.length - 1)];
-
             let left, right, display;
             if (mode === "mul") {
-                // left = row, right = 1..maxFactor
                 left = row;
                 right = randInt(1, maxFactor);
                 display = `${left} × ${right} = `;
             } else {
-                // Division: divisor = row, quotient = 1..maxFactor, dividend = divisor * quotient
                 const divisor = row;
                 const quotient = randInt(1, maxFactor);
-                left = divisor * quotient; // dividend
-                right = divisor; // divisor
+                left = divisor * quotient;
+                right = divisor;
                 display = `${left} ÷ ${right} = `;
             }
 
@@ -111,8 +108,6 @@ document.addEventListener("DOMContentLoaded", function() {
             label.textContent = display;
 
             const input = document.createElement("input");
-            // iOS: inputmode + pattern sorgen für die numerische Tastatur
-            // type="number" beibehalten für semantische Bewertung, alternativ type="tel" wenn iOS Volltastatur zeigt
             input.type = "number";
             input.setAttribute('inputmode', 'numeric');
             input.setAttribute('pattern', '[0-9]*');
@@ -122,18 +117,20 @@ document.addEventListener("DOMContentLoaded", function() {
             input.step = '1';
             input.className = "w3-input w3-inline";
             input.style.maxWidth = "120px";
+
             if (mode === "mul") {
                 input.dataset.answer = String(left * right);
             } else {
                 input.dataset.answer = String(left / right);
             }
+
             input.addEventListener("input", () => {
                 if (input.value && !/^-?\d+$/.test(input.value)) {
                     input.value = input.value.replace(/[^\d-]/g, '');
                 }
             });
 
-            // Neu: Enter verhält sich wie Tab — Fokus auf nächstes Eingabefeld (oder Button)
+            // Enter behaves like Tab
             input.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     e.preventDefault();
@@ -141,12 +138,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     const idx = allInputs.indexOf(e.target);
                     const nextInput = allInputs[idx + 1];
                     if (nextInput) {
-                        // kurzer Timeout, damit Browser-Default vollständig verhindert wurde
-                        setTimeout(() => {
-                            try { nextInput.focus(); if (typeof nextInput.select === 'function') nextInput.select(); } catch (_) {}
-                        }, 0);
+                        setTimeout(() => { try { nextInput.focus(); if (typeof nextInput.select === 'function') nextInput.select(); } catch (_) {} }, 0);
                     } else {
-                        // Wenn keine weitere Eingabe vorhanden, fokussiere "Antworten einreichen"
                         try { submitAnswersBtn.focus(); } catch (_) {}
                     }
                 }
@@ -168,15 +161,21 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function endExercise() {
-        clearInterval(timer);
-        // disable inputs
-        questionsContainer.querySelectorAll('input').forEach(i => i.disabled = true);
-        evaluateAnswers();
-        resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
-        exerciseArea.style.display = "none";
-        resultArea.style.display = "block";
-        startButton.disabled = false;
+    function showFixedTimer() {
+        if (fixedTimer && fixedTimerText) {
+            fixedTimerText.textContent = formatTime(timeLeft);
+            fixedTimer.style.display = 'block';
+            fixedTimer.setAttribute('aria-hidden', 'false');
+            fixedTimer.classList.remove('time-warning');
+        }
+    }
+
+    function hideFixedTimer() {
+        if (fixedTimer) {
+            fixedTimer.style.display = 'none';
+            fixedTimer.setAttribute('aria-hidden', 'true');
+            fixedTimer.classList.remove('time-warning');
+        }
     }
 
     function startExercise() {
@@ -202,103 +201,79 @@ document.addEventListener("DOMContentLoaded", function() {
         resultArea.style.display = "none";
         timerDisplay.textContent = formatTime(timeLeft);
 
+        // show fixed timer
+        showFixedTimer();
+
         // Scroll so that the "Übung" heading is at the top of the viewport
         const heading = exerciseArea.querySelector('h2');
         if (heading && heading.scrollIntoView) {
             heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Fokus auf erstes Eingabefeld setzen (kleine Verzögerung, damit das sanfte Scrollen abgeschlossen ist)
+        // focus first input
         const firstInput = questionsContainer.querySelector('input[type="number"]');
         if (firstInput) {
             setTimeout(() => {
-                try {
-                    firstInput.focus();
-                    if (typeof firstInput.select === 'function') firstInput.select();
-                } catch (e) {
-                    // still safe to ignore focus errors
-                }
+                try { firstInput.focus(); if (typeof firstInput.select === 'function') firstInput.select(); } catch (e) {}
             }, 300);
         }
 
+        // start timer
+        clearInterval(timer);
         timer = setInterval(() => {
             if (timeLeft <= 0) {
                 timerDisplay.textContent = formatTime(0);
+                if (fixedTimerText) fixedTimerText.textContent = formatTime(0);
                 clearInterval(timer);
                 endExercise();
                 return;
             }
             timeLeft--;
             timerDisplay.textContent = formatTime(timeLeft);
+            if (fixedTimerText) fixedTimerText.textContent = formatTime(timeLeft);
+
+            // last 10 seconds: warning
+            if (fixedTimer) {
+                if (timeLeft <= 10) fixedTimer.classList.add('time-warning');
+                else fixedTimer.classList.remove('time-warning');
+            }
         }, 1000);
     }
 
-    // Restart to initial state
-    function restartExercise() {
+    function endExercise() {
         clearInterval(timer);
-        questionsContainer.innerHTML = "";
+        questionsContainer.querySelectorAll('input').forEach(i => i.disabled = true);
+        evaluateAnswers();
+        resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
         exerciseArea.style.display = "none";
-        resultArea.style.display = "none";
-        // enable controls
-        multiplicationCheckbox.disabled = false;
-        divisionCheckbox.disabled = false;
-        rangeContainer.querySelectorAll('input[name="rangeOption"]').forEach(cb => cb.disabled = false);
-        maxFactorSelect.disabled = false;
-        questionCountInput.disabled = false;
-        timeMinutesSelect.disabled = false;
-        timeSecondsSelect.disabled = false;
-        startButton.disabled = true; // keep disabled until valid again
-        submitAnswersBtn.disabled = false; // wieder aktivieren für neue Runde
-        validateInputs();
+        resultArea.style.display = "block";
+        startButton.disabled = false;
+        hideFixedTimer();
     }
-
-    // Events
-    multiplicationCheckbox.addEventListener("change", validateInputs);
-    divisionCheckbox.addEventListener("change", validateInputs);
-
-    // Delegated listener für dynamisch erzeugte / viele Checkboxen
-    rangeContainer.addEventListener("change", (e) => {
-        if (e.target && e.target.name === "rangeOption") validateInputs();
-    });
-
-    maxFactorSelect.addEventListener("change", validateInputs);
-    questionCountInput.addEventListener("input", validateInputs);
-    timeMinutesSelect.addEventListener("change", validateInputs);
-    timeSecondsSelect.addEventListener("change", validateInputs);
-    startButton.addEventListener("click", () => {
-        validateInputs();
-        if (!startButton.disabled) startExercise();
-    });
 
     submitAnswersBtn.addEventListener("click", () => {
         clearInterval(timer);
-        submitAnswersBtn.disabled = true; // nur einmal möglich
+        submitAnswersBtn.disabled = true;
         correctAnswers = 0;
         const inputs = questionsContainer.querySelectorAll('input[type="number"]');
         inputs.forEach(inp => {
             const expected = parseInt(inp.dataset.answer, 10);
             const provided = parseInt(inp.value, 10);
-
-            // disable input
             inp.disabled = true;
 
-            // remove vorhandene Feedback-Elemente
             const existingFb = inp.parentElement.querySelector('.feedback');
             if (existingFb) existingFb.remove();
 
-            // Feedback-Element erstellen
             const fb = document.createElement('span');
             fb.className = 'feedback w3-margin-left w3-small';
 
             if (Number.isInteger(provided) && provided === expected) {
                 correctAnswers++;
-                // grün markieren
                 inp.style.backgroundColor = '#dff0d8';
                 inp.style.borderColor = '#3c763d';
                 fb.textContent = 'Richtig';
                 fb.classList.add('w3-text-green');
             } else {
-                // rot markieren und korrekte Lösung anzeigen
                 inp.style.backgroundColor = '#f2dede';
                 inp.style.borderColor = '#a94442';
                 fb.innerHTML = `Falsch — korrekt: <strong>${expected}</strong>`;
@@ -308,27 +283,47 @@ document.addEventListener("DOMContentLoaded", function() {
             inp.parentElement.appendChild(fb);
         });
 
-        // Gesamtanzeige wie zuvor
         resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
-        // Result-Bereich anzeigen, Aufgaben bleiben sichtbar
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
         startButton.disabled = false;
+        hideFixedTimer();
 
-        // Scroll to "Ergebnisse" heading
+        // Scroll to results heading
         const resultHeading = resultArea.querySelector('h2');
         if (resultHeading && resultHeading.scrollIntoView) {
-            // kleine Verzögerung, damit DOM-Update erfolgt
-            setTimeout(() => {
-                try {
-                    resultHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } catch (e) {}
-            }, 50);
+            setTimeout(() => { try { resultHeading.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 50);
         }
     });
 
-    restartButton.addEventListener("click", restartExercise);
+    restartButton.addEventListener("click", () => {
+        clearInterval(timer);
+        questionsContainer.innerHTML = "";
+        exerciseArea.style.display = "none";
+        resultArea.style.display = "none";
+        multiplicationCheckbox.disabled = false;
+        divisionCheckbox.disabled = false;
+        rangeContainer.querySelectorAll('input[name="rangeOption"]').forEach(cb => cb.disabled = false);
+        maxFactorSelect.disabled = false;
+        questionCountInput.disabled = false;
+        timeMinutesSelect.disabled = false;
+        timeSecondsSelect.disabled = false;
+        startButton.disabled = true;
+        submitAnswersBtn.disabled = false;
+        hideFixedTimer();
+        validateInputs();
+    });
 
-    // initial
+    // Event bindings
+    multiplicationCheckbox.addEventListener("change", validateInputs);
+    divisionCheckbox.addEventListener("change", validateInputs);
+    rangeContainer.addEventListener("change", (e) => { if (e.target && e.target.name === "rangeOption") validateInputs(); });
+    maxFactorSelect.addEventListener("change", validateInputs);
+    questionCountInput.addEventListener("input", validateInputs);
+    timeMinutesSelect.addEventListener("change", validateInputs);
+    timeSecondsSelect.addEventListener("change", validateInputs);
+    startButton.addEventListener("click", () => { validateInputs(); if (!startButton.disabled) startExercise(); });
+
+    // initial validation
     validateInputs();
 });
