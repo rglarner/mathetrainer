@@ -114,18 +114,35 @@ document.addEventListener("DOMContentLoaded", function() {
             input.type = "number";
             input.className = "w3-input w3-inline";
             input.style.maxWidth = "120px";
-            input.dataset.answer = String(mode === "mul" ? left * right : (left / right)); // For mul: left*right? Wait - for mul we displayed left × right; correct result = left*right. For div left/right = quotient.
-            // adjust dataset.answer correctly:
             if (mode === "mul") {
                 input.dataset.answer = String(left * right);
             } else {
                 input.dataset.answer = String(left / right);
             }
+
+            // Existing input sanitization
             input.addEventListener("input", () => {
-                // optional: remove non-digit chars - browser handles with type=number
                 if (input.value && !/^-?\d+$/.test(input.value)) {
-                    // keep only digits and optional leading minus
                     input.value = input.value.replace(/[^\d-]/g, '');
+                }
+            });
+
+            // Neu: Enter verhält sich wie Tab — Fokus auf nächstes Eingabefeld (oder Button)
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const allInputs = Array.from(questionsContainer.querySelectorAll('input[type="number"]'));
+                    const idx = allInputs.indexOf(e.target);
+                    const nextInput = allInputs[idx + 1];
+                    if (nextInput) {
+                        // kurzer Timeout, damit Browser-Default vollständig verhindert wurde
+                        setTimeout(() => {
+                            try { nextInput.focus(); if (typeof nextInput.select === 'function') nextInput.select(); } catch (_) {}
+                        }, 0);
+                    } else {
+                        // Wenn keine weitere Eingabe vorhanden, fokussiere "Antworten einreichen"
+                        try { submitAnswersBtn.focus(); } catch (_) {}
+                    }
                 }
             });
 
@@ -179,6 +196,25 @@ document.addEventListener("DOMContentLoaded", function() {
         resultArea.style.display = "none";
         timerDisplay.textContent = formatTime(timeLeft);
 
+        // Scroll so that the "Übung" heading is at the top of the viewport
+        const heading = exerciseArea.querySelector('h2');
+        if (heading && heading.scrollIntoView) {
+            heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Fokus auf erstes Eingabefeld setzen (kleine Verzögerung, damit das sanfte Scrollen abgeschlossen ist)
+        const firstInput = questionsContainer.querySelector('input[type="number"]');
+        if (firstInput) {
+            setTimeout(() => {
+                try {
+                    firstInput.focus();
+                    if (typeof firstInput.select === 'function') firstInput.select();
+                } catch (e) {
+                    // still safe to ignore focus errors
+                }
+            }, 300);
+        }
+
         timer = setInterval(() => {
             if (timeLeft <= 0) {
                 timerDisplay.textContent = formatTime(0);
@@ -206,6 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
         timeMinutesSelect.disabled = false;
         timeSecondsSelect.disabled = false;
         startButton.disabled = true; // keep disabled until valid again
+        submitAnswersBtn.disabled = false; // wieder aktivieren für neue Runde
         validateInputs();
     }
 
@@ -229,6 +266,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     submitAnswersBtn.addEventListener("click", () => {
         clearInterval(timer);
+        submitAnswersBtn.disabled = true; // nur einmal möglich
         correctAnswers = 0;
         const inputs = questionsContainer.querySelectorAll('input[type="number"]');
         inputs.forEach(inp => {
@@ -270,6 +308,17 @@ document.addEventListener("DOMContentLoaded", function() {
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
         startButton.disabled = false;
+
+        // Scroll to "Ergebnisse" heading
+        const resultHeading = resultArea.querySelector('h2');
+        if (resultHeading && resultHeading.scrollIntoView) {
+            // kleine Verzögerung, damit DOM-Update erfolgt
+            setTimeout(() => {
+                try {
+                    resultHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (e) {}
+            }, 50);
+        }
     });
 
     restartButton.addEventListener("click", restartExercise);
