@@ -111,7 +111,15 @@ document.addEventListener("DOMContentLoaded", function() {
             label.textContent = display;
 
             const input = document.createElement("input");
+            // iOS: inputmode + pattern sorgen für die numerische Tastatur
+            // type="number" beibehalten für semantische Bewertung, alternativ type="tel" wenn iOS Volltastatur zeigt
             input.type = "number";
+            input.setAttribute('inputmode', 'numeric');
+            input.setAttribute('pattern', '[0-9]*');
+            input.setAttribute('enterkeyhint', 'next');
+            input.setAttribute('autocomplete', 'off');
+            input.min = '0';
+            input.step = '1';
             input.className = "w3-input w3-inline";
             input.style.maxWidth = "120px";
             if (mode === "mul") {
@@ -119,8 +127,6 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 input.dataset.answer = String(left / right);
             }
-
-            // Existing input sanitization
             input.addEventListener("input", () => {
                 if (input.value && !/^-?\d+$/.test(input.value)) {
                     input.value = input.value.replace(/[^\d-]/g, '');
