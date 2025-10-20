@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const input = document.createElement("input");
             // iOS: inputmode + pattern sorgen für die numerische Tastatur
             // type="number" beibehalten für semantische Bewertung, alternativ type="tel" wenn iOS Volltastatur zeigt
-            input.type = "tel";
+            input.type = "number";
             input.setAttribute('inputmode', 'numeric');
             input.setAttribute('pattern', '[0-9]*');
             input.setAttribute('enterkeyhint', 'next');
