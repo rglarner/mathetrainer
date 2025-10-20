@@ -161,6 +161,14 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Note berechnen: (5 / möglichePunkte * erreichtePunkte) + 1
+    function computeGrade(possiblePoints, achievedPoints) {
+        if (!Number.isFinite(possiblePoints) || possiblePoints <= 0) return 1.0;
+        const grade = (5 / possiblePoints) * achievedPoints + 1;
+        const clamped = Math.min(6, Math.max(1, grade));
+        return Math.round(clamped * 10) / 10; // auf 1 Dezimalstelle runden
+    }
+
     function showFixedTimer() {
         if (fixedTimer && fixedTimerText) {
             fixedTimerText.textContent = formatTime(timeLeft);
@@ -244,7 +252,8 @@ document.addEventListener("DOMContentLoaded", function() {
         clearInterval(timer);
         questionsContainer.querySelectorAll('input').forEach(i => i.disabled = true);
         evaluateAnswers();
-        resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
+        const grade = computeGrade(totalQuestions, correctAnswers);
+        resultDisplay.innerHTML = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.<br><strong>Note: ${grade.toFixed(1)}</strong>`;
         exerciseArea.style.display = "none";
         resultArea.style.display = "block";
         startButton.disabled = false;
@@ -284,6 +293,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
+        const gradeSubmit = computeGrade(totalQuestions, correctAnswers);
+        resultDisplay.innerHTML = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.<br><strong>Note: ${gradeSubmit.toFixed(1)}</strong>`;
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
         startButton.disabled = false;
