@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reihenübung</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body class="w3-container">
+
+    <header class="w3-bar w3-blue">
+        <a href="index.html" class="w3-bar-item w3-button">Startseite</a>
+        <a href="reihenuebung.html" class="w3-bar-item w3-button">Reihenübung</a>
+    </header>
+
+    <main class="w3-margin-top">
+        <h1>Reihenübung</h1>
+        <form id="exerciseForm" class="w3-container">
+            <label><input type="checkbox" id="multiplication" checked> Multiplikation</label><br>
+            <label><input type="checkbox" id="division"> Division</label><br>
+
+            <label>Reihen (1-12):</label>
+            <div id="rangeContainer" class="w3-margin-bottom">
+                <script>
+                    // Erzeugt Checkboxen 1-12 (mehrfach auswählbar)
+                    const container = document.currentScript.parentElement;
+                    let html = '';
+                    for (let i = 1; i <= 12; i++) {
+                        html += `<label class="w3-margin-right"><input type="checkbox" name="rangeOption" value="${i}"> ${i}</label>`;
+                    }
+                    // Optionale kurze Hilfestellung
+                    html += '<div class="w3-tiny w3-text-grey">Mehrere Reihen möglich</div>';
+                    container.innerHTML = html;
+                </script>
+            </div>
+
+            <label for="maxFactor">Maximaler Faktor (1-12):</label>
+            <select id="maxFactor" class="w3-select">
+                <option value="" disabled>Wählen Sie einen maximalen Faktor</option>
+                <script>
+                    for (let i = 1; i <= 12; i++) {
+                        const sel = (i === 10) ? ' selected' : '';
+                        document.write(`<option value="${i}"${sel}>${i}</option>`);
+                    }
+                </script>
+            </select>
+
+            <label for="questionCount">Anzahl der Fragen (1-100):</label>
+            <input type="number" id="questionCount" min="1" max="100" class="w3-input" value="20">
+
+            <label for="timeLimit">Zeitfenster (maximal 20 Minuten):</label>
+            <div class="w3-row">
+                <div class="w3-col s6">
+                    <select id="timeMinutes" class="w3-select">
+                        <option value="" disabled>Minuten</option>
+                        <script>
+                            for (let i = 0; i <= 20; i++) {
+                                const sel = (i === 2) ? ' selected' : '';
+                                document.write(`<option value="${i}"${sel}>${i} Min</option>`);
+                            }
+                        </script>
+                    </select>
+                </div>
+                <div class="w3-col s6">
+                    <select id="timeSeconds" class="w3-select">
+                        <option value="" disabled>Sekunden</option>
+                        <script>
+                            for (let s = 0; s < 60; s += 5) {
+                                const sel = (s === 0) ? ' selected' : '';
+                                document.write(`<option value="${s}"${sel}>${s} Sek</option>`);
+                            }
+                        </script>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" id="startButton" class="w3-button w3-green" disabled>Start</button>
+            <p id="errorMessage" class="w3-text-red"></p>
+        </form>
+
+        <div id="exerciseArea" class="w3-margin-top" style="display:none;">
+            <h2>Übung</h2>
+            <div id="questions"></div>
+            <p>Verbleibende Zeit: <span id="timer">00:00</span></p>
+            <button id="submitAnswers" class="w3-button w3-blue">Antworten einreichen</button>
+        </div>
+
+        <div id="resultArea" class="w3-margin-top" style="display:none;">
+            <h2>Ergebnisse</h2>
+            <p id="correctAnswers"></p>
+            <button id="restartButton" class="w3-button w3-orange">Neu starten</button>
+        </div>
+    </main>
+
+    <script src="js/reihenuebung.js"></script>
+</body>
+</html>
