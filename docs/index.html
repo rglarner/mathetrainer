@@ -6,6 +6,18 @@
     <title>Mathetrainer</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0b5ea8">
+
+    <!-- iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Mathetrainer">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/mathetrainer180.png">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="./images/mathetrainer192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./images/mathetrainer512.png">
 </head>
 <body class="w3-container">
     <header class="w3-bar w3-blue">
@@ -30,5 +42,12 @@
             </a>
         </p>
     </main>
+
+    <!-- Service Worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {/* registration failed */});
+      }
+    </script>
 </body>
 </html>
