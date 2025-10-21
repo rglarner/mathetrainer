@@ -71,34 +71,31 @@ document.addEventListener("DOMContentLoaded", function() {
         const zahlenraum = parseInt(zahlenraumInput.value, 10);
 
         for (let i = 0; i < totalQuestions; i++) {
-            let a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-            let b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-            let display, answer;
+            let a, b, display, answer;
 
             if (operation === "add") {
-                if (uebertrag) {
-                    // Addition mit Übertrag: Ergebnis kann > 10 sein, aber maximal zahlenraum
-                    while (a + b > zahlenraum) {
-                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                        b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                    }
+                // Summand a zufällig aus den aktivierten Zahlen
+                a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                // Summand b so wählen, dass a + b <= zahlenraum
+                // b darf maximal zahlenraum - a sein, aber muss auch aus den aktivierten Zahlen stammen
+                const possibleB = selectedNumbers.filter(num => (a + num) <= zahlenraum);
+                // Falls keine Zahl passt, nimm das Minimum aus den aktivierten Zahlen
+                if (possibleB.length === 0) {
+                    b = Math.min(...selectedNumbers);
                 } else {
-                    // Addition ohne Übertrag: Ergebnis bleibt im 10er Bereich und maximal zahlenraum
-                    while ((a + b > Math.floor((a + b) / 10) * 10 + 9) || (a + b > zahlenraum)) {
-                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                        b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                    }
+                    b = possibleB[randInt(0, possibleB.length - 1)];
                 }
                 display = `${a} + ${b} = `;
                 answer = a + b;
             } else {
+                // Subtraktion wie gehabt, mit/ohne Übertrag und zahlenraum als Maximalwert für Minuend
+                a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                 if (uebertrag) {
-                    // Subtraktion mit Übertrag: Ergebnis kann < 0 sein, aber Minuend maximal zahlenraum
                     while (a > zahlenraum) {
                         a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                     }
                 } else {
-                    // Subtraktion ohne Übertrag: Ergebnis bleibt >= 0, Minuend maximal zahlenraum
                     while ((a - b < 0) || (a > zahlenraum)) {
                         a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                         b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
