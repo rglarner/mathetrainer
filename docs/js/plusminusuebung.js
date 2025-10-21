@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let totalQuestions = 0;
     let correctAnswers = 0;
     let timeLeft = 0;
+    let submitted = false; // true nach "Antworten einreichen"
 
     function randInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -34,6 +35,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function validateInputs() {
+        if (submitted) {
+            startButton.disabled = true;
+            return;
+        }
         const selectedNumbers = getSelectedNumbers();
         const zahlenraum = parseInt(zahlenraumInput.value, 10);
         const questionCount = parseInt(questionCountInput.value, 10);
@@ -291,6 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
     submitAnswersBtn.addEventListener("click", () => {
         clearInterval(timer);
         submitAnswersBtn.disabled = true;
+        submitted = true; // markiere als eingereicht
         correctAnswers = 0;
         const inputs = questionsContainer.querySelectorAll('input[type="number"]');
         inputs.forEach(inp => {
@@ -328,11 +334,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Startbutton nach Einreichen inaktiv lassen
         startButton.disabled = true;
         hideFixedTimer();
-
-        const resultHeading = resultArea.querySelector('h2');
-        if (resultHeading && resultHeading.scrollIntoView) {
-            setTimeout(() => { try { resultHeading.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 50);
-        }
     });
 
     restartButton.addEventListener("click", () => {
@@ -349,6 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
         startButton.disabled = true;
         submitAnswersBtn.disabled = false;
         hideFixedTimer();
+        submitted = false; // Rücksetzen nach Neustart
         validateInputs();
     });
 
