@@ -72,17 +72,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
         for (let i = 0; i < totalQuestions; i++) {
             let a, b, display, answer;
-
             if (operation === "add") {
-                a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                if (uebertrag) {
-                    const maxB = Math.max(1, zahlenraum - a);
-                    b = randInt(1, maxB);
-                } else {
+                let tries = 0;
+                do {
+                    a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                     const zehner = Math.floor(a / 10) * 10;
-                    // b darf maximal so groß sein, dass a + b <= zehner + 9 UND a + b <= zahlenraum
-                    let maxB = Math.min(zehner + 9 - a, zahlenraum - a);
-                    if (maxB < 1) maxB = 1; // Fallback, damit immer eine Aufgabe entsteht
+                    var maxB = Math.min(zehner + 9 - a, zahlenraum - a);
+                    tries++;
+                } while (maxB < 1 && tries < 20);
+                if (maxB < 1) maxB = 1;
+                if (uebertrag) {
+                    b = randInt(1, Math.max(1, zahlenraum - a));
+                } else {
                     b = randInt(1, maxB);
                 }
                 display = `${a} + ${b} = `;
