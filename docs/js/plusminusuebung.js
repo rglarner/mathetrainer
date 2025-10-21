@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const operationRadios = document.querySelectorAll('input[name="operation"]');
     const uebertragCheckbox = document.getElementById("uebertrag");
     const zahlContainer = document.getElementById("zahlContainer");
@@ -23,6 +23,10 @@ document.addEventListener("DOMContentLoaded", function() {
     let correctAnswers = 0;
     let timeLeft = 0;
 
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function getSelectedNumbers() {
         return Array.from(zahlContainer.querySelectorAll('input[name="zahlOption"]:checked'))
             .map(cb => parseInt(cb.value, 10))
@@ -35,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const questionCount = parseInt(questionCountInput.value, 10);
         const minutes = parseInt(timeMinutesSelect.value, 10);
         const seconds = parseInt(timeSecondsSelect.value, 10);
+
         const minutesOk = Number.isInteger(minutes) && minutes >= 0 && minutes <= 20;
         const secondsOk = Number.isInteger(seconds) && seconds >= 0 && seconds <= 59;
         const totalSec = (Number.isInteger(minutes) ? minutes : 0) * 60 + (Number.isInteger(seconds) ? seconds : 0);
@@ -49,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
             messageBox.textContent = "";
         } else {
             startButton.disabled = true;
-            messageBox.textContent = "Bitte wählen Sie mindestens eine Zahl und füllen Sie alle Felder korrekt aus.";
+            messageBox.textContent = "Bitte wählen Sie mindestens eine Zahl, einen Zahlenraum (10–100) und füllen Sie alle Felder korrekt aus.";
         }
     }
 
@@ -59,10 +64,15 @@ document.addEventListener("DOMContentLoaded", function() {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    function randInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    // compute grade helper (wurde vorher verwendet)
+    function computeGrade(possiblePoints, achievedPoints) {
+        if (!Number.isFinite(possiblePoints) || possiblePoints <= 0) return 1.0;
+        const grade = (5 / possiblePoints) * achievedPoints + 1;
+        const clamped = Math.min(6, Math.max(1, grade));
+        return Math.round(clamped * 10) / 10;
     }
 
+    // Erzeugung der Aufgaben: komplett neu implementiert nach den 4 Fällen
     function generateQuestions() {
         questionsContainer.innerHTML = "";
         const selectedNumbers = getSelectedNumbers();
@@ -72,40 +82,100 @@ document.addEventListener("DOMContentLoaded", function() {
 
         for (let i = 0; i < totalQuestions; i++) {
             let a, b, display, answer;
+
             if (operation === "add") {
-                let tries = 0;
-                do {
-                    a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                    const zehner = Math.floor(a / 10) * 10;
-                    var maxB = Math.min(zehner + 9 - a, zahlenraum - a);
-                    tries++;
-                } while (maxB < 1 && tries < 20);
-                if (maxB < 1) maxB = 1;
+                // Addition
+                // Summand1 = aus den aktivierten Checkboxen
+                a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+
                 if (uebertrag) {
-                    b = randInt(1, Math.max(1, zahlenraum - a));
-                } else {
+                    // Fall 2: Mit Übertrag -> b zufällig 1..(zahlenraum - a)
+                    const maxB = Math.max(1, zahlenraum - a);
                     b = randInt(1, maxB);
+                } else {
+                    // Fall 1: Ohne Übertrag
+                    // b so wählen, dass a + b <= zahlenraum UND (a%10 + b%10) < 10 (kein Übertrag auf die Zehnerstelle)
+                    const maxPossibleB = Math.max(1, zahlenraum - a);
+                    const candidates = [];
+                    for (let candidate = 1; candidate <= maxPossibleB; candidate++) {
+                        if (((a % 10) + (candidate % 10)) < 10) candidates.push(candidate);
+                    }
+                    if (candidates.length === 0) {
+                        // Fallback: suche alternative a (mehr Versuche) — robust machen
+                        let tries = 0;
+                        let found = false;
+                        while (tries < 50 && !found) {
+                            a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                            const maxB2 = Math.max(1, zahlenraum - a);
+                            const c2 = [];
+                            for (let candidate = 1; candidate <= maxB2; candidate++) {
+                                if (((a % 10) + (candidate % 10)) < 10) c2.push(candidate);
+                            }
+                            if (c2.length > 0) {
+                                b = c2[randInt(0, c2.length - 1)];
+                                found = true;
+                                break;
+                            }
+                            tries++;
+                        }
+                        if (!found) {
+                            // definitive fallback: b = 1 (garantiert kein Übertrag falls a%10+1<10, sonst bleibt es 1)
+                            b = 1;
+                        }
+                    } else {
+                        b = candidates[randInt(0, candidates.length - 1)];
+                    }
                 }
+
                 display = `${a} + ${b} = `;
                 answer = a + b;
             } else {
-                // Subtraktion wie gehabt, mit/ohne Übertrag und zahlenraum als Maximalwert für Minuend
-                a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                // Subtraktion
+                // Subtrahend (b) muss aus aktivierten Checkboxes gewählt werden
                 b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+
                 if (uebertrag) {
-                    while (a > zahlenraum) {
-                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                    }
+                    // Fall 4: Mit Übertrag -> Minuend a zufällig 1..zahlenraum (kein weitere Bedingung)
+                    a = randInt(1, zahlenraum);
                 } else {
-                    while ((a - b < 0) || (a > zahlenraum)) {
-                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                        b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                    // Fall 3: Ohne Übertrag
+                    // Minuend a muss >= b (keine negative Ergebnisse) UND a <= zahlenraum
+                    // UND (a%10 - b%10) >= 0 (kein Zehnerunterschreiten / kein Borrow)
+                    const candidatesA = [];
+                    for (let candidate = b; candidate <= zahlenraum; candidate++) {
+                        if (((candidate % 10) - (b % 10)) >= 0) candidatesA.push(candidate);
+                    }
+                    if (candidatesA.length === 0) {
+                        // Fallback: suche alternative b (falls möglich)
+                        let tries = 0;
+                        let found = false;
+                        while (tries < 50 && !found) {
+                            b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                            const cand = [];
+                            for (let candidate = b; candidate <= zahlenraum; candidate++) {
+                                if (((candidate % 10) - (b % 10)) >= 0) cand.push(candidate);
+                            }
+                            if (cand.length > 0) {
+                                a = cand[randInt(0, cand.length - 1)];
+                                found = true;
+                                break;
+                            }
+                            tries++;
+                        }
+                        if (!found) {
+                            // definitive fallback: a = b (Ergebnis 0)
+                            a = b;
+                        }
+                    } else {
+                        a = candidatesA[randInt(0, candidatesA.length - 1)];
                     }
                 }
+
                 display = `${a} - ${b} = `;
                 answer = a - b;
             }
 
+            // Erzeuge DOM-Element für eine Aufgabe
             const qDiv = document.createElement("div");
             qDiv.className = "w3-margin-bottom";
 
@@ -116,21 +186,23 @@ document.addEventListener("DOMContentLoaded", function() {
             const input = document.createElement("input");
             input.type = "number";
             input.setAttribute('inputmode', 'numeric');
-            input.setAttribute('pattern', '[0-9]*');
+            input.setAttribute('pattern', '[0-9-]*');
             input.setAttribute('enterkeyhint', 'next');
             input.setAttribute('autocomplete', 'off');
-            input.min = '-99';
-            input.step = '1';
             input.className = "w3-input w3-inline";
             input.style.maxWidth = "120px";
+            input.min = '-999';
+            input.step = '1';
             input.dataset.answer = String(answer);
 
+            // Eingabefilter: nur ganze Zahlen zulassen
             input.addEventListener("input", () => {
                 if (input.value && !/^-?\d+$/.test(input.value)) {
                     input.value = input.value.replace(/[^\d-]/g, '');
                 }
             });
 
+            // Enter -> nächstes Eingabefeld / Submit-Button
             input.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     e.preventDefault();
@@ -159,13 +231,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const provided = parseInt(inp.value, 10);
             if (Number.isInteger(provided) && provided === expected) correctAnswers++;
         });
-    }
-
-    function computeGrade(possiblePoints, achievedPoints) {
-        if (!Number.isFinite(possiblePoints) || possiblePoints <= 0) return 1.0;
-        const grade = (5 / possiblePoints) * achievedPoints + 1;
-        const clamped = Math.min(6, Math.max(1, grade));
-        return Math.round(clamped * 10) / 10;
     }
 
     function showFixedTimer() {
@@ -208,16 +273,10 @@ document.addEventListener("DOMContentLoaded", function() {
         showFixedTimer();
 
         const heading = exerciseArea.querySelector('h2');
-        if (heading && heading.scrollIntoView) {
-            heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (heading && heading.scrollIntoView) heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         const firstInput = questionsContainer.querySelector('input[type="number"]');
-        if (firstInput) {
-            setTimeout(() => {
-                try { firstInput.focus(); if (typeof firstInput.select === 'function') firstInput.select(); } catch (e) {}
-            }, 300);
-        }
+        if (firstInput) setTimeout(() => { try { firstInput.focus(); if (typeof firstInput.select === 'function') firstInput.select(); } catch (e) {} }, 300);
 
         clearInterval(timer);
         timer = setInterval(() => {
@@ -322,5 +381,6 @@ document.addEventListener("DOMContentLoaded", function() {
     zahlenraumInput.addEventListener("input", validateInputs);
     startButton.addEventListener("click", () => { validateInputs(); if (!startButton.disabled) startExercise(); });
 
+    // initial
     validateInputs();
 });
