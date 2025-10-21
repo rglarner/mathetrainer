@@ -324,7 +324,9 @@ document.addEventListener("DOMContentLoaded", function () {
         resultDisplay.innerHTML = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.<br><strong>Note: ${gradeSubmit.toFixed(1)}</strong>`;
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
-        startButton.disabled = false;
+        //        startButton.disabled = false;
+        // Startbutton nach Einreichen inaktiv lassen
+        startButton.disabled = true;
         hideFixedTimer();
 
         const resultHeading = resultArea.querySelector('h2');
