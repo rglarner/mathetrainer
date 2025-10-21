@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const restartButton = document.getElementById("restartButton");
     const fixedTimer = document.getElementById("fixedTimer");
     const fixedTimerText = document.getElementById("fixedTimerText");
+    const zahlenraumInput = document.getElementById("zahlenraum");
 
     let timer;
     let totalQuestions = 0;
@@ -30,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function validateInputs() {
         const selectedNumbers = getSelectedNumbers();
+        const zahlenraum = parseInt(zahlenraumInput.value, 10);
         const questionCount = parseInt(questionCountInput.value, 10);
         const minutes = parseInt(timeMinutesSelect.value, 10);
         const seconds = parseInt(timeSecondsSelect.value, 10);
@@ -37,8 +39,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const secondsOk = Number.isInteger(seconds) && seconds >= 0 && seconds <= 59;
         const totalSec = (Number.isInteger(minutes) ? minutes : 0) * 60 + (Number.isInteger(seconds) ? seconds : 0);
         const timeOk = totalSec >= 1 && totalSec <= 20 * 60;
+        const zahlenraumOk = Number.isInteger(zahlenraum) && zahlenraum >= 10 && zahlenraum <= 100;
 
         if (selectedNumbers.length > 0 &&
+            zahlenraumOk &&
             Number.isInteger(questionCount) && questionCount >= 1 && questionCount <= 100 &&
             minutesOk && secondsOk && timeOk) {
             startButton.disabled = false;
@@ -64,6 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const selectedNumbers = getSelectedNumbers();
         const uebertrag = uebertragCheckbox.checked;
         const operation = Array.from(operationRadios).find(r => r.checked).value;
+        const zahlenraum = parseInt(zahlenraumInput.value, 10);
 
         for (let i = 0; i < totalQuestions; i++) {
             let a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
@@ -72,13 +77,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (operation === "add") {
                 if (uebertrag) {
-                    // Addition mit Übertrag: Ergebnis kann > 10 sein
-                    // z.B. 8 + 8 = 16
-                    // Zahlen aus 1-12, keine Einschränkung
+                    // Addition mit Übertrag: Ergebnis kann > 10 sein, aber maximal zahlenraum
+                    while (a + b > zahlenraum) {
+                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                        b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                    }
                 } else {
-                    // Addition ohne Übertrag: Ergebnis bleibt im 10er Bereich
-                    // z.B. 7 + 2 = 9, 13 + 4 = 17 (bleibt unter 20)
-                    while (a + b > Math.floor((a + b) / 10) * 10 + 9) {
+                    // Addition ohne Übertrag: Ergebnis bleibt im 10er Bereich und maximal zahlenraum
+                    while ((a + b > Math.floor((a + b) / 10) * 10 + 9) || (a + b > zahlenraum)) {
+                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                         b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                     }
                 }
@@ -86,11 +93,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 answer = a + b;
             } else {
                 if (uebertrag) {
-                    // Subtraktion mit Übertrag: Ergebnis kann < 0 sein
-                    // z.B. 3 - 8 = -5
+                    // Subtraktion mit Übertrag: Ergebnis kann < 0 sein, aber Minuend maximal zahlenraum
+                    while (a > zahlenraum) {
+                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                    }
                 } else {
-                    // Subtraktion ohne Übertrag: Ergebnis bleibt >= 0
-                    while (a - b < 0) {
+                    // Subtraktion ohne Übertrag: Ergebnis bleibt >= 0, Minuend maximal zahlenraum
+                    while ((a - b < 0) || (a > zahlenraum)) {
+                        a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                         b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                     }
                 }
@@ -311,6 +321,7 @@ document.addEventListener("DOMContentLoaded", function() {
     questionCountInput.addEventListener("input", validateInputs);
     timeMinutesSelect.addEventListener("change", validateInputs);
     timeSecondsSelect.addEventListener("change", validateInputs);
+    zahlenraumInput.addEventListener("input", validateInputs);
     startButton.addEventListener("click", () => { validateInputs(); if (!startButton.disabled) startExercise(); });
 
     validateInputs();
