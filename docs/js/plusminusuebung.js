@@ -76,15 +76,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (operation === "add") {
                 // Summand a zufällig aus den aktivierten Zahlen
                 a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                // Summand b so wählen, dass a + b <= zahlenraum
-                // b darf maximal zahlenraum - a sein, aber muss auch aus den aktivierten Zahlen stammen
-                const possibleB = selectedNumbers.filter(num => (a + num) <= zahlenraum);
-                // Falls keine Zahl passt, nimm das Minimum aus den aktivierten Zahlen
-                if (possibleB.length === 0) {
-                    b = Math.min(...selectedNumbers);
-                } else {
-                    b = possibleB[randInt(0, possibleB.length - 1)];
-                }
+                // Summand b: Zufallszahl zwischen 1 und (zahlenraum - a)
+                const maxB = Math.max(1, zahlenraum - a);
+                b = randInt(1, maxB);
                 display = `${a} + ${b} = `;
                 answer = a + b;
             } else {
