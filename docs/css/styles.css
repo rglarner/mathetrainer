@@ -133,3 +133,13 @@ button:disabled {
 @media (max-width: 420px) {
     #fixedTimer { font-size: 0.95rem; padding: 6px 10px; top: 8px; right: 8px; }
 }
+
+#submitAnswers,
+#restartButton {
+    margin-bottom: 3rem; /* mehr Platz unter den Buttons */
+}
+
+/* Optional: etwas extra Platz am Seitenende, falls Inhalte lang sind */
+main {
+    padding-bottom: 2.5rem;
+}
