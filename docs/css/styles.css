@@ -84,15 +84,16 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1.5px solid #2196F3;
+    border: 2px solid #2196F3; /* Deutlichere Linie */
     border-radius: 6px;
     padding: 4px 0 4px 0;
     background: #f8fafd;
     cursor: pointer;
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.2s, border-color 0.2s;
     min-width: 40px;
     font-weight: 500;
     gap: 4px;
+    box-sizing: border-box; /* Damit die Linie nicht abgeschnitten wird */
 }
 .reihe-box input[type="checkbox"] {
     margin: 0 4px 0 0;
@@ -101,6 +102,7 @@ button:disabled {
 .reihe-box:focus-within, .reihe-box:hover {
     box-shadow: 0 0 0 2px #2196F333;
     background: #e3f2fd;
+    border-color: #1565c0; /* dunkler beim Hover/Fokus */
 }
 /* Fester Timer oben rechts */
 #fixedTimer {
