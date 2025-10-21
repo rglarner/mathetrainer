@@ -293,17 +293,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
-        const gradeSubmit = computeGrade(totalQuestions, correctAnswers);
-        resultDisplay.innerHTML = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.<br><strong>Note: ${gradeSubmit.toFixed(1)}</strong>`;
+        // Result-Bereich anzeigen, Aufgaben bleiben sichtbar
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
-        startButton.disabled = false;
-        hideFixedTimer();
+        //        startButton.disabled = false;
+        startButton.disabled = true;
 
-        // Scroll to results heading
-        const resultHeading = resultArea.querySelector('h2');
-        if (resultHeading && resultHeading.scrollIntoView) {
-            setTimeout(() => { try { resultHeading.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 50);
+        // Fixed timer verbergen nach Einreichen
+        if (fixedTimer) {
+            fixedTimer.style.display = 'none';
+            fixedTimer.setAttribute('aria-hidden', 'true');
+            fixedTimer.classList.remove('time-warning');
         }
     });
 
