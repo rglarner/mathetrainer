@@ -79,9 +79,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     const maxB = Math.max(1, zahlenraum - a);
                     b = randInt(1, maxB);
                 } else {
-                    // Zehnerbereich berechnen
+                    // Zehnerbereich von a bestimmen
                     const zehner = Math.floor(a / 10) * 10;
-                    // b darf maximal so groß sein, dass a + b <= zehner + 9 und a + b <= zahlenraum
+                    // b darf maximal so groß sein, dass a + b <= zehner + 9 UND a + b <= zahlenraum
                     const maxB = Math.min(zehner + 9 - a, zahlenraum - a);
                     b = randInt(1, Math.max(1, maxB));
                 }
