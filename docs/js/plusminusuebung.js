@@ -74,15 +74,15 @@ document.addEventListener("DOMContentLoaded", function() {
             let a, b, display, answer;
 
             if (operation === "add") {
-                // Summand a zufällig aus den aktivierten Zahlen
                 a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
                 if (uebertrag) {
                     const maxB = Math.max(1, zahlenraum - a);
                     b = randInt(1, maxB);
                 } else {
-                    // b so wählen, dass a und b im selben Zehnerbereich liegen und a + b <= zahlenraum und a + b < nächster Zehner
+                    // Zehnerbereich berechnen
                     const zehner = Math.floor(a / 10) * 10;
-                    const maxB = Math.min(zahlenraum - a, zehner + 9 - a);
+                    // b darf maximal so groß sein, dass a + b <= zehner + 9 und a + b <= zahlenraum
+                    const maxB = Math.min(zehner + 9 - a, zahlenraum - a);
                     b = randInt(1, Math.max(1, maxB));
                 }
                 display = `${a} + ${b} = `;
