@@ -1,32 +1,69 @@
-# Reihenübung Webseite
+# Mathetrainer — Webübungen
 
-Dieses Projekt ist eine interaktive Webseite zur Durchführung von mathematischen Übungen, die Multiplikation und Division umfasst. Die Webseite verwendet das W3.CSS-Framework für ein responsives Design und bietet eine benutzerfreundliche Oberfläche.
+Kleine, lokale Webseite mit zwei interaktiven Rechenübungen (Reihen & Plus/Minus) — optimiert für Desktop und Mobil (inkl. PWA‑Option).
 
-## Projektstruktur
+## Projektstruktur (aktuell im Ordner `docs`)
+- `docs/index.html` — Startseite
+- `docs/reihenuebung.html` — Reihenübung (Multiplikation / Division)
+- `docs/plusminusuebung.html` — PlusMinusÜbung (Addition / Subtraktion)
+- `docs/links.html` — Sammlung deutschsprachiger Mathe‑Links
+- `docs/manifest.json` — Web App Manifest (PWA)
+- `docs/sw.js` — Service Worker (Offline‑Cache)
+- `docs/css/styles.css` — Projekt‑CSS (inkl. Grid für Checkboxen, Timer, etc.)
+- `docs/js/reihenuebung.js` — Logik für Reihenübung (Fragen, Timer, Bewertung)
+- `docs/js/plusminusuebung.js` — Logik für Plus/Minus (Übertrag, Zahlenraum, Regeln)
+- `docs/images/` — Icons (z. B. `mathetrainer180.png`, `mathetrainer192.png`, `mathetrainer512.png`)
 
-- `src/index.html`: Startseite der Webseite, die den Text "Hallo Leute" anzeigt.
-- `src/reihenuebung.html`: Benutzeroberfläche für die "Reihenübung" mit Auswahlmöglichkeiten für Multiplikation und Division, einer Reihe von 1-12, einem Dropdown für den maximalen Faktor (1-12), einer Textbox für die Anzahl der Fragen (1-100) und einem Zeitfenster (maximal 20 Minuten).
-- `src/css/styles.css`: CSS-Stile für die Webseite, die das W3.CSS-Framework verwendet.
-- `src/js/reihenuebung.js`: JavaScript-Datei, die die Logik für die "Reihenübung" implementiert, einschließlich der Validierung der Eingaben, der Generierung von Aufgaben und der Verwaltung des Timers.
-- `.gitignore`: Liste der Dateien und Verzeichnisse, die von Git ignoriert werden sollen.
+## Funktionen (Kurzüberblick)
 
-## Funktionen
+Allgemein
+- Läuft komplett clientseitig — keine Daten werden an Server geschickt.
+- Optionale PWA‑Unterstützung (Manifest, Service Worker, apple‑touch‑icon).
+- Feste Timer‑Anzeige oben rechts während der Übung; in den letzten 10 Sekunden rot.
+- Tastaturoptimierung auf Mobilgeräten: numerische Eingabe (inputmode, pattern), optional `type="tel"` wenn nötig.
+- Ergebnisanzeige inkl. Note (Formel: Note = (5 / möglichePunkte * erreichtePunkte) + 1; gerundet auf 1 Dezimalstelle; Skala 1–6).
 
-- Auswahl von Multiplikation und Division.
-- Auswahl der Reihe (1-12).
-- Dropdown für den maximalen Faktor (1-12).
-- Eingabefeld für die Anzahl der Fragen (1-100).
-- Zeitfenster für die Übung (maximal 20 Minuten).
-- Validierung der Eingaben und Aktivierung des Startknopfes.
-- Generierung von mathematischen Aufgaben und Timer für die Übung.
-- Anzeige der Anzahl der korrekten Antworten am Ende der Übung.
-- Möglichkeit, die Übung neu zu starten.
+Reihenübung (`reihenuebung.html`)
+- Auswahl: Multiplikation (Mal *) und/oder Division (Geteilt /).
+- Auswahl der Reihen (1–12) per deutlich umrandeten Checkbox‑Grid.
+- Maximaler Faktor (Dropdown 1–12), Anzahl Fragen (1–100), Zeitfenster (bis 20 Minuten).
+- Aufgaben werden generiert, Anzeige der verbleibenden Zeit, Bewertung und Feedback zu einzelnen Antworten.
+- Reihenfolge der Faktoren bei Multiplikation wird zufällig vertauscht (Anzeigevariation).
 
-## Verwendung
+PlusMinusÜbung (`plusminusuebung.html`)
+- Auswahl: Addition - Plus (+) oder Subtraktion / Minus (−).
+- Option "Mit Übertrag" (Erlaubt Zehnersprünge) als Checkbox.
+- Auswahl der Summanden/Subtrahenden per Checkbox‑Grid (1–12).
+- Neues Feld "Zahlenraum" (maximale Summe / maximaler Minuend; Bereich 10–100).
+- Verhaltensregeln:
+  - Addition ohne Übertrag: Summand1 aus Checkboxen, Summand2 so gewählt, dass Summe ≤ Zahlenraum und kein Überschreiten ganzer Zehner (10, 20, 30 …).
+  - Addition mit Übertrag: Summand2 so gewählt, dass Summe ≤ Zahlenraum; Zehnersprünge erlaubt.
+  - Subtraktion ohne Übertrag: Subtrahend aus Checkboxen; Minuend ≤ Zahlenraum; Ergebnis ≥ 0 und kein „Borrow“ über Zehnergrenzen.
+  - Subtraktion mit Übertrag: Minuend ≤ Zahlenraum; Subtrahend aus Checkboxen, sonst keine Einschränkung.
+- Reihenfolge von Summand1 / Summand2 wird bei Anzeige zufällig vertauscht.
 
-1. Klonen Sie das Repository oder laden Sie die Dateien herunter.
-2. Öffnen Sie die `src/index.html`-Datei in einem Webbrowser, um die Startseite anzuzeigen.
-3. Navigieren Sie zur Seite "Reihenübung", um mit den mathematischen Übungen zu beginnen.
-4. Geben Sie die erforderlichen Informationen ein und klicken Sie auf "Start", um die Übung zu beginnen.
+Bedienung
+- Formular validiert Eingaben; Start‑Button nur aktiv, wenn alle Parameter gültig sind.
+- Nach Klick "Antworten einreichen" bleibt der Start‑Button inaktiv bis "Neu starten" gedrückt wird.
+- Ergebnisseite zeigt Punkte und berechnete Note; einzelne Antworten werden als richtig/falsch markiert und mit Korrekturen angezeigt.
+- Zusätzlicher Abstand unter Buttons für bessere Bedienung auf Mobilgeräten.
 
-Viel Spaß beim Üben!
+## Lokal testen (Dev‑Container, Linux)
+Im Projekt‑Root (Repo) die Seite aus `docs` als statischen Server starten:
+
+```bash
+cd /workspaces/mathetrainer/docs
+python3 -m http.server 8000
+$BROWSER http://localhost:8000
+```
+
+PWA / iOS Hinweise
+- Für GitHub Pages: Repository‑Einstellungen → GitHub Pages → Source: `docs` (falls gewünscht).
+- iOS: Safari zeigt kein automatisches Install‑Prompt; Nutzer müssen "Zum Home‑Bildschirm" wählen. apple‑touch‑icon und apple‑mobile‑web‑app‑meta werden unterstützt; Service Worker wird in neueren iOS‑Versionen unterstützt.
+- Stelle sicher, dass die Icon‑Dateien (`mathetrainer180.png`, `mathetrainer192.png`, `mathetrainer512.png`) in `docs/images/` vorhanden sind.
+
+## Entwickeln / Anpassen
+- HTML/JS/CSS liegen unter `docs/`. Änderungen dort sind sofort testbar via lokalem Server.
+- Bei größeren Änderungen: Browser‑Cache leeren, Service Worker ggf. in DevTools deaktivieren oder `sw.js` Version erhöhen, damit neue Assets geladen werden.
+
+Viel Erfolg beim Weiterentwickeln und Testen!
