@@ -91,7 +91,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (mode === "mul") {
                 left = row;
                 right = randInt(1, maxFactor);
-                display = `${left} × ${right} = `;
+                // Zufällige Vertauschung der Anzeige (Faktorenreihenfolge)
+                const swap = Math.random() < 0.5;
+                display = swap ? `${right} × ${left} = ` : `${left} × ${right} = `;
             } else {
                 const divisor = row;
                 const quotient = randInt(1, maxFactor);
