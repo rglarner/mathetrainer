@@ -23,13 +23,23 @@
     <main class="w3-margin-top">
         <h1>PlusMinusÜbung</h1>
         <form id="plusminusForm" class="w3-container">
-            <label><input type="radio" name="operation" value="add" checked> Addition - Plus (+)</label>
-            <label><input type="radio" name="operation" value="sub"> Subtraktion - Minus (-)</label>
+            <label>
+                <input type="radio" name="operation" value="add" checked> Addition - Plus (+)
+                <button type="button" class="help" data-help="Wähle Addition, wenn zwei Zahlen addiert werden sollen.">?</button>
+            </label>
+            <label>
+                <input type="radio" name="operation" value="sub"> Subtraktion - Minus (-)
+                <button type="button" class="help" data-help="Wähle Subtraktion, wenn von einer Zahl eine andere abgezogen werden soll.">?</button>
+            </label>
             <br>
-            <label><input type="checkbox" id="uebertrag"> Mit Übertrag</label>
+            <label>
+                <input type="checkbox" id="uebertrag"> Mit Übertrag
+                <button type="button" class="help" data-help="Mit Übertrag dürfen die Schülerinnen bei der Addition über ganze Zehner springen, z. B. 8 + 8 = 16. Ohne Übertrag bleibt die Zehnerstelle gleich.">?</button>
+            </label>
             <br>
             <label>Zahlen (1-12):</label>
             <div id="zahlContainer" class="w3-margin-bottom reihen-grid">
+                <button type="button" class="help" data-help="Wähle hier die Ziffern, aus denen der erste Summand bzw. Subtrahend gezogen wird (z. B. 2, 3, 7).">?</button>
                 <script>
                     const zc = document.currentScript.parentElement;
                     let html = '';
@@ -40,9 +50,13 @@
                     zc.innerHTML = html;
                 </script>
             </div>
-            <label for="zahlenraum">Zahlenraum (maximale Summe/Minuend, 10–100):</label>
+            <label for="zahlenraum">Zahlenraum (maximale Summe/Minuend, 10–100):
+                <button type="button" class="help" data-help="Die Zahl bestimmt die grösste erlaubte Summe (bei Addition) bzw. den grössten Minuenden (bei Subtraktion).">?</button>
+            </label>
             <input type="number" id="zahlenraum" min="10" max="100" class="w3-input" value="20">
-            <label for="questionCount">Anzahl der Fragen (1-100):</label>
+            <label for="questionCount">Anzahl der Fragen (1-100):
+                <button type="button" class="help" data-help="Wie viele Aufgaben werden pro Runde gestellt.">?</button>
+            </label>
             <input type="number" id="questionCount" min="1" max="100" class="w3-input" value="20">
             <label for="timeLimit">Zeitfenster (maximal 20 Minuten):</label>
             <div class="w3-row">
@@ -70,6 +84,7 @@
                 </div>
             </div>
             <button type="button" id="startButton" class="w3-button w3-green" disabled>Start</button>
+            <button type="button" class="help" data-help="Drücke Start, wenn alle Einstellungen passen. Der Timer beginnt und die Aufgaben erscheinen.">?</button>
             <p id="errorMessage" class="w3-text-red"></p>
         </form>
 
@@ -86,6 +101,7 @@
             <button id="restartButton" class="w3-button w3-orange">Neu starten</button>
         </div>
     </main>
-    <script src="js/plusminusuebung.js"></script>
+    <script src="js/help.js"></script>
+     <script src="js/plusminusuebung.js"></script>
 </body>
 </html>

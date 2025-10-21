@@ -134,12 +134,78 @@ button:disabled {
     #fixedTimer { font-size: 0.95rem; padding: 6px 10px; top: 8px; right: 8px; }
 }
 
-#submitAnswers,
-#restartButton {
-    margin-bottom: 3rem; /* mehr Platz unter den Buttons */
+/* Hilfe-Icon / Tooltip für kurze Erklärungen (Hover + Touch) */
+.help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.45rem;
+    height: 1.45rem;
+    margin-left: 0.4rem;
+    border-radius: 50%;
+    background: #0b5ea8;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    border: none;
+    position: relative;
+    vertical-align: middle;
+    padding: 0;
+}
+.help:focus { outline: 2px solid #ffd54f; outline-offset: 2px; }
+
+/* Tooltip-Text (Text-only) */
+.help::after {
+    content: attr(data-help);
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(100% + 10px);
+    white-space: normal;
+    max-width: 20rem;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    text-align: left;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
 }
 
-/* Optional: etwas extra Platz am Seitenende, falls Inhalte lang sind */
-main {
-    padding-bottom: 2.5rem;
+/* kleine Pfeilspitze */
+.help::before {
+    content: '';
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(100% + 2px);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0,0,0,0.85) transparent;
+    z-index: 9999;
+}
+
+/* Sichtbar bei Hover (Desktop) oder bei expliziter Klasse (Touch) */
+.help:hover::after,
+.help:hover::before,
+.help.help-visible::after,
+.help.help-visible::before {
+    display: block;
+}
+
+/* Tooltip oben Platz begrenzen auf kleine Bildschirme */
+@media (max-width: 420px) {
+    .help::after { max-width: 14rem; font-size: 0.82rem; }
+}
+
+/* kleine Anpassung: Abstand unter den Buttons (bereits ergänzt, bleibt) */
+#submitAnswers,
+#restartButton {
+    margin-bottom: 3rem;
 }

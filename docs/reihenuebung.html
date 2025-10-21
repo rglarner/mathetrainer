@@ -24,10 +24,18 @@
     <main class="w3-margin-top">
         <h1>Reihenübung</h1>
         <form id="exerciseForm" class="w3-container">
-            <label><input type="checkbox" id="multiplication" checked> Multiplikation - Mal (*)</label><br>
-            <label><input type="checkbox" id="division"> Division - Geteilt (/)</label><br>
+            <label>
+                <input type="checkbox" id="multiplication" checked> Multiplikation - Mal (*)
+                <button type="button" class="help" data-help="Multiplikation: wiederholtes Addieren (z. B. 3 × 4 = 12).">?</button>
+            </label><br>
+            <label>
+                <input type="checkbox" id="division"> Division - Geteilt (/)
+                <button type="button" class="help" data-help="Division: Teile eine Zahl in gleich grosse Teile (z. B. 12 ÷ 3 = 4).">?</button>
+            </label><br>
 
-            <label>Reihen (1-12):</label>
+            <label>Reihen (1-12):
+                <button type="button" class="help" data-help="Wähle die Reihen (z. B. 2er-, 3er-Reihe). Jede Box besteht aus Checkbox + Zahl.">?</button>
+            </label>
             <div id="rangeContainer" class="w3-margin-bottom reihen-grid">
                 <!-- Checkboxen werden per JS erzeugt -->
             </div>
@@ -46,7 +54,9 @@
                 container.innerHTML = html;
             </script>
 
-            <label for="maxFactor">Maximaler Faktor (1-12):</label>
+            <label for="maxFactor">Maximaler Faktor (1-12):
+                <button type="button" class="help" data-help="Der grösste Faktor, der bei Multiplikation/Division verwendet wird.">?</button>
+            </label>
             <select id="maxFactor" class="w3-select">
                 <option value="" disabled>Wählen Sie einen maximalen Faktor</option>
                 <script>
@@ -87,6 +97,7 @@
             </div>
 
             <button type="button" id="startButton" class="w3-button w3-green" disabled>Start</button>
+            <button type="button" class="help" data-help="Drücke Start, wenn alle Einstellungen passen.">?</button>
             <p id="errorMessage" class="w3-text-red"></p>
         </form>
 
@@ -104,6 +115,7 @@
         </div>
     </main>
 
+    <script src="js/help.js"></script>
     <script src="js/reihenuebung.js"></script>
 </body>
 </html>
