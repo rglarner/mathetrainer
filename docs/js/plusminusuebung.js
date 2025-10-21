@@ -79,11 +79,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     const maxB = Math.max(1, zahlenraum - a);
                     b = randInt(1, maxB);
                 } else {
-                    // Zehnerbereich von a bestimmen
                     const zehner = Math.floor(a / 10) * 10;
                     // b darf maximal so groß sein, dass a + b <= zehner + 9 UND a + b <= zahlenraum
-                    const maxB = Math.min(zehner + 9 - a, zahlenraum - a);
-                    b = randInt(1, Math.max(1, maxB));
+                    let maxB = Math.min(zehner + 9 - a, zahlenraum - a);
+                    if (maxB < 1) maxB = 1; // Fallback, damit immer eine Aufgabe entsteht
+                    b = randInt(1, maxB);
                 }
                 display = `${a} + ${b} = `;
                 answer = a + b;
