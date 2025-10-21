@@ -126,7 +126,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Wähle b zufällig in [1, allowedMax]
                 b = randInt(1, allowedMax);
 
-                display = `${a} + ${b} = `;
+                // Reihenfolge der Summanden vor Anzeige zufällig vertauschen
+                const swap = Math.random() < 0.5;
+                display = swap ? `${b} + ${a} = ` : `${a} + ${b} = `;
                 answer = a + b;
             } else {
                 // Subtraktion
