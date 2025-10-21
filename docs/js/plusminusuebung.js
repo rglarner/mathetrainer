@@ -85,89 +85,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (operation === "add") {
                 // Addition
-                // Summand1 = aus den aktivierten Checkboxen
-                a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                // Wähle a aus den aktivierten Checkboxen; falls kein passendes a existiert, versuche mehrfach
+                let triesA = 0;
+                let foundA = false;
+                let allowedMax = 0;
 
-                if (uebertrag) {
-                    // Fall 2: Mit Übertrag -> b zufällig 1..(zahlenraum - a)
-                    const maxB = Math.max(1, zahlenraum - a);
-                    b = randInt(1, maxB);
-                } else {
-                    // Fall 1: Ohne Übertrag
-                    // b so wählen, dass a + b <= zahlenraum UND (a%10 + b%10) < 10 (kein Übertrag auf die Zehnerstelle)
-                    const maxPossibleB = Math.max(1, zahlenraum - a);
-                    const candidates = [];
-                    for (let candidate = 1; candidate <= maxPossibleB; candidate++) {
-                        if (((a % 10) + (candidate % 10)) < 10) candidates.push(candidate);
-                    }
-                    if (candidates.length === 0) {
-                        // Fallback: suche alternative a (mehr Versuche) — robust machen
-                        let tries = 0;
-                        let found = false;
-                        while (tries < 50 && !found) {
-                            a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                            const maxB2 = Math.max(1, zahlenraum - a);
-                            const c2 = [];
-                            for (let candidate = 1; candidate <= maxB2; candidate++) {
-                                if (((a % 10) + (candidate % 10)) < 10) c2.push(candidate);
-                            }
-                            if (c2.length > 0) {
-                                b = c2[randInt(0, c2.length - 1)];
-                                found = true;
-                                break;
-                            }
-                            tries++;
-                        }
-                        if (!found) {
-                            // definitive fallback: b = 1 (garantiert kein Übertrag falls a%10+1<10, sonst bleibt es 1)
-                            b = 1;
-                        }
+                while (triesA < 100 && !foundA) {
+                    a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                    const maxByZahlenraum = Math.max(1, zahlenraum - a);
+
+                    if (uebertrag) {
+                        // Mit Übertrag: b darf bis zahlenraum - a
+                        allowedMax = maxByZahlenraum;
                     } else {
-                        b = candidates[randInt(0, candidates.length - 1)];
+                        // Ohne Übertrag: b darf so groß sein, dass a+b <= zahlenraum
+                        // UND a+b bleibt im selben Zehnerbereich wie a (kein Überschreiten von 10,20,...)
+                        const endOfDecade = (Math.floor(a / 10) + 1) * 10 - 1; // z.B. a=17 -> 19
+                        const maxByDecade = endOfDecade - a;
+                        allowedMax = Math.min(maxByZahlenraum, Math.max(0, maxByDecade));
                     }
+
+                    if (allowedMax >= 1) {
+                        foundA = true;
+                        break;
+                    }
+                    triesA++;
                 }
+
+                if (!foundA) {
+                    // Fallback: falls kein a mit allowedMax>=1 gefunden wurde, wähle einfach a aus Checkboxen
+                    a = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
+                    allowedMax = Math.max(1, Math.min(zahlenraum - a, 9)); // defensiver Fallback
+                }
+
+                // Wähle b zufällig in [1, allowedMax]
+                b = randInt(1, allowedMax);
 
                 display = `${a} + ${b} = `;
                 answer = a + b;
             } else {
                 // Subtraktion
-                // Subtrahend (b) muss aus aktivierten Checkboxes gewählt werden
+                // b aus Checkboxen (Subtrahend)
                 b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
 
                 if (uebertrag) {
-                    // Fall 4: Mit Übertrag -> Minuend a zufällig 1..zahlenraum (kein weitere Bedingung)
+                    // Mit Übertrag: Minuend a beliebig 1..zahlenraum
                     a = randInt(1, zahlenraum);
                 } else {
-                    // Fall 3: Ohne Übertrag
-                    // Minuend a muss >= b (keine negative Ergebnisse) UND a <= zahlenraum
-                    // UND (a%10 - b%10) >= 0 (kein Zehnerunterschreiten / kein Borrow)
-                    const candidatesA = [];
-                    for (let candidate = b; candidate <= zahlenraum; candidate++) {
-                        if (((candidate % 10) - (b % 10)) >= 0) candidatesA.push(candidate);
+                    // Ohne Übertrag: Minuend a so wählen, dass a >= b, a <= zahlenraum und kein Zehner-unborrow:
+                    // (a % 10) - (b % 10) >= 0
+                    let tries = 0;
+                    let found = false;
+                    while (tries < 100 && !found) {
+                        const candidateA = randInt(b, zahlenraum);
+                        if (((candidateA % 10) - (b % 10)) >= 0) {
+                            a = candidateA;
+                            found = true;
+                            break;
+                        }
+                        tries++;
                     }
-                    if (candidatesA.length === 0) {
-                        // Fallback: suche alternative b (falls möglich)
-                        let tries = 0;
-                        let found = false;
-                        while (tries < 50 && !found) {
-                            b = selectedNumbers[randInt(0, selectedNumbers.length - 1)];
-                            const cand = [];
-                            for (let candidate = b; candidate <= zahlenraum; candidate++) {
-                                if (((candidate % 10) - (b % 10)) >= 0) cand.push(candidate);
-                            }
-                            if (cand.length > 0) {
-                                a = cand[randInt(0, cand.length - 1)];
-                                found = true;
-                                break;
-                            }
-                            tries++;
-                        }
-                        if (!found) {
-                            // definitive fallback: a = b (Ergebnis 0)
-                            a = b;
-                        }
-                    } else {
-                        a = candidatesA[randInt(0, candidatesA.length - 1)];
+                    if (!found) {
+                        // Fallback: setze a = b (Ergebnis 0)
+                        a = b;
                     }
                 }
 
@@ -175,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 answer = a - b;
             }
 
-            // Erzeuge DOM-Element für eine Aufgabe
+            // DOM erzeugen
             const qDiv = document.createElement("div");
             qDiv.className = "w3-margin-bottom";
 
@@ -195,14 +175,12 @@ document.addEventListener("DOMContentLoaded", function () {
             input.step = '1';
             input.dataset.answer = String(answer);
 
-            // Eingabefilter: nur ganze Zahlen zulassen
             input.addEventListener("input", () => {
                 if (input.value && !/^-?\d+$/.test(input.value)) {
                     input.value = input.value.replace(/[^\d-]/g, '');
                 }
             });
 
-            // Enter -> nächstes Eingabefeld / Submit-Button
             input.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     e.preventDefault();
