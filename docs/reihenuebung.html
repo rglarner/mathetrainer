@@ -6,6 +6,38 @@
     <title>Reihenübung</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        .reihen-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(40px, 1fr));
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+            max-width: 340px;
+        }
+        .reihe-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid #2196F3;
+            border-radius: 6px;
+            padding: 4px 0 4px 0;
+            background: #f8fafd;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+            min-width: 40px;
+            font-weight: 500;
+            gap: 4px;
+        }
+        .reihe-box input[type="checkbox"] {
+            margin: 0 4px 0 0;
+            accent-color: #2196F3;
+        }
+        .reihe-box:focus-within, .reihe-box:hover {
+            box-shadow: 0 0 0 2px #2196F333;
+            background: #e3f2fd;
+        }
+    </style>
 </head>
 <body class="w3-container">
 
@@ -27,19 +59,23 @@
             <label><input type="checkbox" id="division"> Division</label><br>
 
             <label>Reihen (1-12):</label>
-            <div id="rangeContainer" class="w3-margin-bottom">
-                <script>
-                    // Erzeugt Checkboxen 1-12 (mehrfach auswählbar)
-                    const container = document.currentScript.parentElement;
-                    let html = '';
-                    for (let i = 1; i <= 12; i++) {
-                        html += `<label class="w3-margin-right"><input type="checkbox" name="rangeOption" value="${i}"> ${i}</label>`;
-                    }
-                    // Optionale kurze Hilfestellung
-                    html += '<div class="w3-tiny w3-text-grey">Mehrere Reihen möglich</div>';
-                    container.innerHTML = html;
-                </script>
+            <div id="rangeContainer" class="w3-margin-bottom reihen-grid">
+                <!-- Checkboxen werden per JS erzeugt -->
             </div>
+            <script>
+                const container = document.getElementById('rangeContainer');
+                let html = '';
+                for (let i = 1; i <= 12; i++) {
+                    html += `
+                    <label class="reihe-box">
+                        <input type="checkbox" name="rangeOption" value="${i}">
+                        <span>${i}</span>
+                    </label>
+                    `;
+                }
+                html += '<div class="w3-tiny w3-text-grey" style="grid-column: 1 / -1;">Mehrere Reihen möglich</div>';
+                container.innerHTML = html;
+            </script>
 
             <label for="maxFactor">Maximaler Faktor (1-12):</label>
             <select id="maxFactor" class="w3-select">
