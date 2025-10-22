@@ -253,6 +253,56 @@ form.w3-container br {
     vertical-align: middle;
 }
 
+/* Radiobutton-/Checkbox-Abstände: normale Breite zwischen Kontrollfeld und Text */
+#plusminusForm label,
+#plusminusForm .inline-checkbox,
+form.w3-container label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem; /* Abstand zwischen Radio/Checkbox und Beschriftung */
+    vertical-align: middle;
+}
+
+/* Sicherstellen, dass Inputs keinen unerwarteten zusätzlichen Abstand erzeugen */
+#plusminusForm input[type="radio"],
+#plusminusForm input[type="checkbox"],
+form.w3-container input[type="radio"],
+form.w3-container input[type="checkbox"] {
+    margin: 0; /* Abstand wird über gap gesteuert */
+}
+
+/* Bei sehr kleinen Bildschirmen etwas enger */
+@media (max-width: 420px) {
+    #plusminusForm label,
+    #plusminusForm .inline-checkbox,
+    form.w3-container label {
+        gap: 0.45rem;
+    }
+}
+
+/* zusätzlich: geringere Lücke nach <br> innerhalb Formularen */
+form.w3-container br {
+    line-height: 0.2;
+    margin: 0;
+}
+
+/* kleinere Bildschirme: noch kompakter */
+@media (max-width: 420px) {
+    form.w3-container label {
+        margin-top: 0.08rem;
+        margin-bottom: 0.28rem;
+    }
+}
+
+/* kompaktere Abstände im PlusMinus‑Formular */
+#plusminusForm label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;         /* Abstand zwischen Kontrollkästchen/Radio, Text und Hilfe-Icon */
+    margin-right: 0.35rem; /* Abstand zur nächsten Kontrolle reduzieren */
+    vertical-align: middle;
+}
+
 /* Speziell: weniger Abstand links/rechts für das Label mit dem "Mit Übertrag"-Checkbox */
 #plusminusForm label:has(input#uebertrag) {
     margin-left: 0.15rem;
