@@ -315,36 +315,14 @@ form.w3-container br {
     #plusminusForm label:has(input#uebertrag) { margin-left: 0.1rem; margin-right: 0.1rem; }
 }
 
-/* Einheitliche Schriftgrössen für Header / Menu und Seiten-Titel
-   Damit PlusMinus und Reihen dieselben Größen wie Index und Links verwenden */
+/* Einheitliche Schrift für Header / Menü und Seitentitel (erzwingt Arial wie auf Index/Links) */
 header,
 header .w3-bar-item,
 header .w3-button,
 nav a,
 #mainNav a,
-.w3-bar-item.w3-button {
-    font-size: 1rem; /* Menü / Header-Links: gleiche Grundgröße */
-}
-
 .w3-container h1,
 .w3-container h2,
 .page-title {
-    font-size: 1.25rem; /* Seiten-Titel: einheitliche Größe */
-    margin-top: 0.5rem;
-    margin-bottom: 0.6rem;
-}
-
-/* Bei sehr kleinen Bildschirmen leicht skalieren */
-@media (max-width: 420px) {
-    header,
-    header .w3-bar-item,
-    header .w3-button,
-    nav a {
-        font-size: 0.95rem;
-    }
-    .w3-container h1,
-    .w3-container h2,
-    .page-title {
-        font-size: 1.1rem;
-    }
+    font-family: Arial, sans-serif !important;
 }
