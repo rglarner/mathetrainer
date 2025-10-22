@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   toggles.forEach(btn => {
+    // ensure initial aria state
+    btn.setAttribute('aria-expanded', 'false');
+
     const navId = btn.getAttribute('aria-controls');
     const nav = document.getElementById(navId);
     if (!nav) return;
@@ -17,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // schliesse Menü wenn ein Nav-Link angeklickt oder getoucht wird (wichtig für Mobile)
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => closeAll());
+    link.addEventListener('touchstart', () => closeAll(), { passive: true });
+  });
+
   // Klick ausserhalb schliesst Menü (mobile)
   document.addEventListener('click', (e) => {
     if (!e.target.closest('header')) closeAll();
@@ -25,8 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!e.target.closest('header')) closeAll();
   });
 
+  // ESC schliesst geöffnetes Menü
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAll();
+  });
+
   // Beim Vergrössern Fenster Menü schliessen
   window.addEventListener('resize', () => {
     if (window.innerWidth > 700) closeAll();
   });
+
+  // Sicherstellen, dass das Menü beim Laden eingeklappt ist
+  closeAll();
 });
