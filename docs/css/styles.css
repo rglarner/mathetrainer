@@ -243,3 +243,24 @@ form.w3-container br {
         margin-bottom: 0.28rem;
     }
 }
+
+/* kompaktere Abstände im PlusMinus‑Formular */
+#plusminusForm label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;         /* Abstand zwischen Kontrollkästchen/Radio, Text und Hilfe-Icon */
+    margin-right: 0.35rem; /* Abstand zur nächsten Kontrolle reduzieren */
+    vertical-align: middle;
+}
+
+/* Speziell: weniger Abstand links/rechts für das Label mit dem "Mit Übertrag"-Checkbox */
+#plusminusForm label:has(input#uebertrag) {
+    margin-left: 0.15rem;
+    margin-right: 0.15rem;
+}
+
+/* Sehr kleine Bildschirme noch kompakter */
+@media (max-width: 420px) {
+    #plusminusForm label { gap: 0.22rem; margin-right: 0.2rem; }
+    #plusminusForm label:has(input#uebertrag) { margin-left: 0.1rem; margin-right: 0.1rem; }
+}
