@@ -48,14 +48,10 @@ Bedienung
 - Ergebnisseite zeigt Punkte und berechnete Note; einzelne Antworten werden als richtig/falsch markiert und mit Korrekturen angezeigt.
 - Zusätzlicher Abstand unter Buttons für bessere Bedienung auf Mobilgeräten.
 
-## Lokal testen (Dev‑Container, Linux)
-Im Projekt‑Root (Repo) die Seite aus `docs` als statischen Server starten:
+## Live‑Demo
+Die Webseite ist auch online verfügbar: https://rglarner.github.io/mathetrainer/
 
-```bash
-cd /workspaces/mathetrainer/docs
-python3 -m http.server 8000
-$BROWSER http://localhost:8000
-```
+
 
 PWA / iOS Hinweise
 - Für GitHub Pages: Repository‑Einstellungen → GitHub Pages → Source: `docs` (falls gewünscht).
