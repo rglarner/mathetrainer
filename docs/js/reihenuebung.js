@@ -294,11 +294,12 @@ document.addEventListener("DOMContentLoaded", function() {
             inp.parentElement.appendChild(fb);
         });
 
-        resultDisplay.textContent = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.`;
+        const gradeSubmit = computeGrade(totalQuestions, correctAnswers);
+        resultDisplay.innerHTML = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.<br><strong>Note: ${gradeSubmit.toFixed(1)}</strong>`;
         // Result-Bereich anzeigen, Aufgaben bleiben sichtbar
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
-        //        startButton.disabled = false;
+        // Startbutton nach Einreichen inaktiv lassen
         startButton.disabled = true;
 
         // Fixed timer verbergen nach Einreichen
@@ -307,6 +308,15 @@ document.addEventListener("DOMContentLoaded", function() {
             fixedTimer.setAttribute('aria-hidden', 'true');
             fixedTimer.classList.remove('time-warning');
         }
+
+        // Beim Einreichen ganz nach unten scrollen (mobil + desktop)
+        setTimeout(() => {
+            try {
+                window.scrollTo({ top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight), behavior: 'smooth' });
+            } catch (e) {
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        }, 80);
     });
 
     restartButton.addEventListener("click", () => {
@@ -325,6 +335,15 @@ document.addEventListener("DOMContentLoaded", function() {
         submitAnswersBtn.disabled = false;
         hideFixedTimer();
         validateInputs();
+
+        // Beim Neustart ganz nach oben scrollen (mobil + desktop)
+        setTimeout(() => {
+            try {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                window.scrollTo(0, 0);
+            }
+        }, 60);
     });
 
     // Event bindings
