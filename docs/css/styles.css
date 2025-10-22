@@ -209,3 +209,17 @@ button:disabled {
 #restartButton {
     margin-bottom: 3rem;
 }
+
+/* kompakte Darstellung für zwei Checkbox‑Optionen nebeneinander */
+.inline-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 0.8rem;
+    vertical-align: middle;
+}
+
+/* bei sehr kleinen Bildschirmen etwas enger */
+@media (max-width: 420px) {
+    .inline-checkbox { gap: 0.35rem; margin-right: 0.5rem; }
+}
