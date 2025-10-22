@@ -332,10 +332,18 @@ document.addEventListener("DOMContentLoaded", function () {
         resultDisplay.innerHTML = `Sie haben ${correctAnswers} von ${totalQuestions} richtig beantwortet.<br><strong>Note: ${gradeSubmit.toFixed(1)}</strong>`;
         resultArea.style.display = "block";
         exerciseArea.style.display = "block";
-        //        startButton.disabled = false;
         // Startbutton nach Einreichen inaktiv lassen
         startButton.disabled = true;
         hideFixedTimer();
+
+        // Beim Einreichen ganz nach unten scrollen (mobil + desktop)
+        setTimeout(() => {
+            try {
+                window.scrollTo({ top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight), behavior: 'smooth' });
+            } catch (e) {
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        }, 80);
     });
 
     restartButton.addEventListener("click", () => {
@@ -354,6 +362,15 @@ document.addEventListener("DOMContentLoaded", function () {
         hideFixedTimer();
         submitted = false; // Rücksetzen nach Neustart
         validateInputs();
+
+        // Beim Neustart ganz nach oben scrollen (mobil + desktop)
+        setTimeout(() => {
+            try {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                window.scrollTo(0, 0);
+            }
+        }, 60);
     });
 
     Array.from(operationRadios).forEach(r => r.addEventListener("change", validateInputs));
