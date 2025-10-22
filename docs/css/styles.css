@@ -223,3 +223,23 @@ button:disabled {
 @media (max-width: 420px) {
     .inline-checkbox { gap: 0.35rem; margin-right: 0.5rem; }
 }
+
+/* kompaktere Abstände in Formularen (reduziert u. a. den Abstand oberhalb der "Mit Übertrag"-Zeile) */
+form.w3-container label {
+    margin-top: 0.12rem;
+    margin-bottom: 0.35rem;
+}
+
+/* zusätzlich: geringere Lücke nach <br> innerhalb Formularen */
+form.w3-container br {
+    line-height: 0.2;
+    margin: 0;
+}
+
+/* kleinere Bildschirme: noch kompakter */
+@media (max-width: 420px) {
+    form.w3-container label {
+        margin-top: 0.08rem;
+        margin-bottom: 0.28rem;
+    }
+}
