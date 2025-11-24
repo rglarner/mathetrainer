@@ -1,6 +1,6 @@
 // Registrierung und Update‑Handling für den Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(reg => {
+  navigator.serviceWorker.register('/mathetrainer/sw.js', { scope: '/' }).then(reg => {
     function promptAndActivate(worker) {
       // Sofort aktivieren und danach neu laden
       try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
