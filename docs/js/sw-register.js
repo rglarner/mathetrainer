@@ -1,11 +1,13 @@
-// Registrierung und Update‑Handling für den Service Worker
+// Registrierung und Update‑Handling für den Service Worker (Scope an Repo-Pfad anpassen)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/mathetrainer/sw.js', { scope: '/' }).then(reg => {
+  // Passe Pfad + Scope an deine GitHub Pages-Subpath an
+  const SW_URL = '/mathetrainer/sw.js';
+  const SW_SCOPE = '/mathetrainer/';
+
+  navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE }).then(reg => {
     function promptAndActivate(worker) {
-      // Sofort aktivieren und danach neu laden
       try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        // einmalig neu laden, wenn Controller wechselt
         if (!window.__sw_reloaded) {
           window.__sw_reloaded = true;
           window.location.reload();
@@ -25,6 +27,6 @@ if ('serviceWorker' in navigator) {
       });
     });
   }).catch(() => {
-    // Registrierung fehlgeschlagen (offline/zugriffsrechte)
+    // Registrierung fehlgeschlagen (z.B. offline)
   });
 }
