@@ -48,34 +48,7 @@
             </ol>
             <p>Die App startet danach wie eine normale App und kann auch offline arbeiten (für bereits geladene Seiten). Bei Updates einfach die Seite neu laden. Keine Anmeldung nötig, keine Daten werden übertragen.</p>
         </section>
-
     </main>
-
-    <!-- Service Worker registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-          // wenn neuer SW installiert und wartet
-          function onWaiting(worker) {
-            // Option A: automatische Aktivierung
-            worker.postMessage({ type: 'SKIP_WAITING' });
-            // nach skipWaiting: reload aller Clients, damit neue Dateien aktiv sind
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-              window.location.reload(true);
-            });
-          }
-
-          if (reg.waiting) onWaiting(reg.waiting);
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                onWaiting(newWorker);
-              }
-            });
-          });
-        }).catch(() => { /* Registrierung fehlgeschlagen */ });
-      }
-    </script>
+    <script src="js/sw-register.js"></script>
 </body>
 </html>
