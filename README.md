@@ -27,6 +27,14 @@ Reihenübung (`reihenuebung.html`)
 - Auswahl: Multiplikation (Mal *) und/oder Division (Geteilt /).
 - Auswahl der Reihen (1–12) per deutlich umrandeten Checkbox‑Grid.
 - Maximaler Faktor (Dropdown 1–12), Anzahl Fragen (1–100), Zeitfenster (bis 20 Minuten).
+- Neue Option: "Skalierung" (Dropdown)
+  - Werte: "keine" (=1), 10, 100, 1000, 10000. Standard: "keine".
+  - Darstellung/Platzierung: analog zur Faktorenauswahl als Dropdown im Formular.
+  - Verhalten: Bei jeder generierten Aufgabe wird zufällig eine erlaubte Skalierung aus dem Bereich 1..gewähltemMax angewendet. Mit ~80% Wahrscheinlichkeit wird dabei eine Skalierung >1 (10/100/1000/10000) gewählt, sofern verfügbar.
+  - Mathematische Anwendung:
+    - Multiplikation: Skalierung wird auf beide Faktoren angewendet (z. B. bei Reihe 3 und Skalierung 10 → 30 × (faktor*10)).
+    - Division: Skalierung wird auf Divisor und Quotient angewendet; Dividend wird so konstruiert, dass die Division ganzzahlig bleibt.
+  - UI: Dropdown wird beim Start der Übung deaktiviert (wie andere Form‑Elemente) und beim Neustart wieder aktivierbar.
 - Aufgaben werden generiert, Anzeige der verbleibenden Zeit, Bewertung und Feedback zu einzelnen Antworten.
 - Reihenfolge der Faktoren bei Multiplikation wird zufällig vertauscht (Anzeigevariation).
 
