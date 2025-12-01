@@ -326,3 +326,37 @@ nav a,
 .page-title {
     font-family: Arial, sans-serif !important;
 }
+
+/* Stil für den "Alle"-Button wie die reihe-box */
+#selectAllRows {
+    border: 2px solid #2196F3;
+    border-radius: 6px;
+    padding: 6px 8px;
+    background: #f8fafd !important;
+    color: inherit;
+    cursor: pointer;
+    min-width: 40px;
+    font-weight: 500;
+    gap: 4px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    font-size: 0.78rem; /* passend zu w3-tiny */
+}
+
+/* Hover / Fokus wie bei reihe-box */
+#selectAllRows:hover,
+#selectAllRows:focus {
+    box-shadow: 0 0 0 2px #2196F333;
+    background: #e3f2fd !important;
+    border-color: #1565c0;
+    outline: none;
+}
+
+/* Kleinere Darstellung auf sehr kleinen Bildschirmen */
+@media (max-width: 420px) {
+    #selectAllRows { padding: 5px 7px; font-size: 0.72rem; }
+}

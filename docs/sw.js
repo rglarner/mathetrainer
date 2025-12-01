@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mathetrainer-v1';
+const CACHE_NAME = 'mathetrainer-v2'; // vorher z.B. v1 erhöhen
 // Liste der Assets relativ zum Site‑Root-Subpath; keine führenden '/' hier
 const ASSETS = [
   'index.html',
@@ -18,37 +18,35 @@ function basePath() {
   try { return self.registration.scope || '/mathetrainer/'; } catch (e) { return '/mathetrainer/'; }
 }
 
-self.addEventListener('install', (ev) => {
-  ev.waitUntil((async () => {
-    const base = basePath();
-    const cache = await caches.open(CACHE_NAME);
-    const urls = ASSETS.map(a => new URL(a, base).href);
-
-    // Versuche jedes Asset zu holen; speichere nur erfolgreiche Antworten
-    await Promise.all(urls.map(async (url) => {
-      try {
-        const resp = await fetch(url, { cache: 'no-cache' });
-        if (!resp || (resp.status && resp.status >= 400)) {
-          console.warn('Skipping bad asset', url, resp && resp.status);
-          return;
-        }
-        await cache.put(url, resp.clone());
-      } catch (err) {
-        console.warn('Asset failed to cache, skipping', url, err);
-      }
-    }));
-
-    // Aktivieren erlauben
-    await self.skipWaiting();
-  })());
+self.addEventListener('install', (event) => {
+    self.skipWaiting(); // sofort aktiv werden
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.addAll([
+                'index.html',
+                'plusminusuebung.html',
+                'reihenuebung.html',
+                'links.html',
+                'css/styles.css',
+                'js/plusminusuebung.js',
+                'js/reihenuebung.js',
+                'js/sw-register.js',
+                'js/help.js',
+                'images/mathetrainer192.png'
+            ]);
+        })
+    );
 });
 
-self.addEventListener('activate', (ev) => {
-  ev.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
-    await self.clients.claim();
-  })());
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        (async () => {
+            // alte Caches entfernen
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => { if (k !== CACHE_NAME) return caches.delete(k); }));
+            await self.clients.claim(); // Seiten sofort übernehmen
+        })()
+    );
 });
 
 self.addEventListener('fetch', (ev) => {

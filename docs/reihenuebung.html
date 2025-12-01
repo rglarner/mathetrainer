@@ -37,6 +37,9 @@
             <label>Reihen (1-12):
                 <button type="button" class="help" data-help="Wähle die Reihen (z. B. 2er-, 3er-Reihe). Jede Box besteht aus Checkbox + Zahl.">?</button>
             </label>
+            <div class="w3-margin-bottom">
+                <button type="button" id="selectAllRows" class="w3-button w3-tiny w3-light-grey">Alle</button>
+            </div>
             <div id="rangeContainer" class="w3-margin-bottom reihen-grid">
                 <!-- Checkboxen werden per JS erzeugt -->
             </div>
@@ -70,6 +73,24 @@
 
             <label for="questionCount">Anzahl der Fragen (1-100):</label>
             <input type="number" id="questionCount" min="1" max="100" class="w3-input" value="20">
+
+            <!-- Neu: Max. Skalierung -->
+            <label for="maxScale">Max. Skalierung:
+                <button type="button" class="help" data-help="Skalierung multipliziert Zahlen mit 1, 10, 100, 1000 oder 10000. 'keine' = 1. Je nach Auswahl wird bei jeder Frage zufällig eine erlaubte Skalierung angewendet.">?</button>
+            </label>
+            <select id="maxScale" class="w3-select">
+                <option value="" disabled>Wählen Sie eine maximale Skalierung</option>
+                <script>
+                    (function() {
+                        const scales = [1, 10, 100, 1000, 10000];
+                        for (let s of scales) {
+                            const label = (s === 1) ? 'keine' : s;
+                            const sel = (s === 1) ? ' selected' : '';
+                            document.write(`<option value="${s}"${sel}>${label}</option>`);
+                        }
+                    })();
+                </script>
+            </select>
 
             <label for="timeLimit">Zeitfenster (maximal 20 Minuten):</label>
             <div class="w3-row">

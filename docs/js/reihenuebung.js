@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const divisionCheckbox = document.getElementById("division");
     const rangeContainer = document.getElementById("rangeContainer");
     const maxFactorSelect = document.getElementById("maxFactor");
+    const maxScaleSelect = document.getElementById("maxScale");
     const questionCountInput = document.getElementById("questionCount");
     const timeMinutesSelect = document.getElementById("timeMinutes");
     const timeSecondsSelect = document.getElementById("timeSeconds");
@@ -77,6 +78,8 @@ document.addEventListener("DOMContentLoaded", function() {
         questionsContainer.innerHTML = "";
         const selectedRows = getSelectedRows();
         const maxFactor = parseInt(maxFactorSelect.value, 10);
+        // parse maxScale als Zahl (Fallback 1)
+        const maxScaleValue = parseInt(maxScaleSelect && maxScaleSelect.value ? maxScaleSelect.value : "1", 10) || 1;
         const includeMul = multiplicationCheckbox.checked;
         const includeDiv = divisionCheckbox.checked;
 
@@ -87,19 +90,26 @@ document.addEventListener("DOMContentLoaded", function() {
             else mode = "div";
 
             const row = selectedRows[randInt(0, selectedRows.length - 1)];
-            let left, right, display;
+            let display;
+            // wähle zufällige zulässige Skalierung basierend auf der Benutzerauswahl
+            const scale = pickRandomScale(maxScaleValue);
+
             if (mode === "mul") {
-                left = row;
-                right = randInt(1, maxFactor);
-                // Zufällige Vertauschung der Anzeige (Faktorenreihenfolge)
+                // Skalierung auf beide Faktoren anwenden
+                const a = row * scale;
+                const b = randInt(1, maxFactor) * scale;
                 const swap = Math.random() < 0.5;
-                display = swap ? `${right} × ${left} = ` : `${left} × ${right} = `;
+                display = swap ? `${b} × ${a} = ` : `${a} × ${b} = `;
+                var expectedAnswer = a * b;
+                var inputValueMin = 0;
             } else {
-                const divisor = row;
-                const quotient = randInt(1, maxFactor);
-                left = divisor * quotient;
-                right = divisor;
-                display = `${left} ÷ ${right} = `;
+                // Skalierung auf Divisor und Quotient anwenden
+                const divisor = row * scale;
+                const quotient = randInt(1, maxFactor) * scale;
+                const dividend = divisor * quotient;
+                display = `${dividend} ÷ ${divisor} = `;
+                var expectedAnswer = quotient;
+                var inputValueMin = 0;
             }
 
             const qDiv = document.createElement("div");
@@ -115,16 +125,12 @@ document.addEventListener("DOMContentLoaded", function() {
             input.setAttribute('pattern', '[0-9]*');
             input.setAttribute('enterkeyhint', 'next');
             input.setAttribute('autocomplete', 'off');
-            input.min = '0';
+            input.min = String(inputValueMin);
             input.step = '1';
             input.className = "w3-input w3-inline";
             input.style.maxWidth = "120px";
 
-            if (mode === "mul") {
-                input.dataset.answer = String(left * right);
-            } else {
-                input.dataset.answer = String(left / right);
-            }
+            input.dataset.answer = String(expectedAnswer);
 
             input.addEventListener("input", () => {
                 if (input.value && !/^-?\d+$/.test(input.value)) {
@@ -201,6 +207,10 @@ document.addEventListener("DOMContentLoaded", function() {
         divisionCheckbox.disabled = true;
         rangeContainer.querySelectorAll('input[name="rangeOption"]').forEach(cb => cb.disabled = true);
         maxFactorSelect.disabled = true;
+        // Skalierungs-Dropdown während der Übung sperren
+        if (maxScaleSelect) maxScaleSelect.disabled = true;
+        // "Alle"-Button sperren wie die anderen Form-Elemente
+        if (selectAllRowsBtn) selectAllRowsBtn.disabled = true;
         questionCountInput.disabled = true;
         timeMinutesSelect.disabled = true;
         timeSecondsSelect.disabled = true;
@@ -328,6 +338,9 @@ document.addEventListener("DOMContentLoaded", function() {
         divisionCheckbox.disabled = false;
         rangeContainer.querySelectorAll('input[name="rangeOption"]').forEach(cb => cb.disabled = false);
         maxFactorSelect.disabled = false;
+        if (maxScaleSelect) maxScaleSelect.disabled = false;
+        // "Alle"-Button wieder aktivieren
+        if (selectAllRowsBtn) selectAllRowsBtn.disabled = false;
         questionCountInput.disabled = false;
         timeMinutesSelect.disabled = false;
         timeSecondsSelect.disabled = false;
@@ -346,11 +359,68 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 60);
     });
 
+    // Neue Skalierungen (10000 hinzugefügt)
+    const SCALES = [1, 10, 100, 1000, 10000];
+    
+    function getAllowedScales(maxScaleValue) {
+        const max = Number(maxScaleValue) || 1;
+        return SCALES.filter(s => s <= max);
+    }
+    
+    function pickRandomScale(maxScaleValue) {
+        const allowed = getAllowedScales(maxScaleValue);
+        if (allowed.length === 0) return 1;
+        const nonOne = allowed.filter(s => s > 1);
+        if (nonOne.length === 0) return 1;
+        const chooseNonOne = Math.random() < 0.8;
+        if (chooseNonOne) {
+            return nonOne[Math.floor(Math.random() * nonOne.length)];
+        }
+        return allowed.includes(1) ? 1 : nonOne[Math.floor(Math.random() * nonOne.length)];
+    }
+
+    // Beispiel: Integration in existierende Fragegenerierung.
+    // Ersetze bzw. erweitere die Stelle, an der Faktoren / Dividend/Divisor erzeugt werden,
+    // durch die folgende Logik. (Anpassung an vorhandene Variablennamen nötig.)
+
+    function generateQuestionForRow(rowValue, maxFactor, isMultiplication, maxScaleValue) {
+        // rowValue: die gewählte Reihen-Zahl (z.B. 3 für 3er-Reihe)
+        // maxFactor: maximaler Faktor (1..12)
+        // isMultiplication: true = Multiplikation, false = Division
+        // maxScaleValue: Wert des neuen Selects (1,10,100,1000)
+
+        const scale = pickRandomScale(maxScaleValue);
+
+        // wähle einen zufälligen weiteren Faktor (1..maxFactor)
+        const other = Math.floor(Math.random() * maxFactor) + 1;
+
+        if (isMultiplication) {
+            // Skalierung auf beide Faktoren anwenden
+            const a = rowValue * scale;
+            const b = other * scale;
+            const questionText = `${a} × ${b} = ?`;
+            const answer = a * b;
+            return { questionText, answer, scaleUsed: scale };
+        } else {
+            // Division: Skalierung auf Divisor und Quotient anwenden, Dividend entsprechend konstruieren
+            const divisor = rowValue * scale;
+            const quotient = other * scale;
+            const dividend = divisor * quotient;
+            const questionText = `${dividend} ÷ ${divisor} = ?`;
+            const answer = quotient;
+            return { questionText, answer, scaleUsed: scale };
+        }
+    }
+
+    // Beispiel-Aufruf innerhalb der bestehenden Logik:
+    // const q = generateQuestionForRow(chosenRow, Number(document.getElementById('maxFactor').value), multiplicationChecked, document.getElementById('maxScale').value);
+
     // Event bindings
     multiplicationCheckbox.addEventListener("change", validateInputs);
     divisionCheckbox.addEventListener("change", validateInputs);
     rangeContainer.addEventListener("change", (e) => { if (e.target && e.target.name === "rangeOption") validateInputs(); });
     maxFactorSelect.addEventListener("change", validateInputs);
+    if (maxScaleSelect) maxScaleSelect.addEventListener("change", validateInputs);
     questionCountInput.addEventListener("input", validateInputs);
     timeMinutesSelect.addEventListener("change", validateInputs);
     timeSecondsSelect.addEventListener("change", validateInputs);
@@ -358,4 +428,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // initial validation
     validateInputs();
+
+    // nachdem DOM-Elemente erstellt/zugewiesen sind
+    const selectAllRowsBtn = document.getElementById('selectAllRows');
+
+    if (selectAllRowsBtn) {
+        selectAllRowsBtn.addEventListener('click', () => {
+            // Alle Reihen-Checkboxen aktivieren
+            const boxes = rangeContainer.querySelectorAll('input[name="rangeOption"]');
+            boxes.forEach(cb => {
+                cb.checked = true;
+            });
+            // Ausgabe/Validierung aktualisieren
+            try { validateInputs(); } catch (e) {}
+        });
+    }
 });
